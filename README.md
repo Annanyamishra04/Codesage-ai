@@ -108,6 +108,6 @@ More languages for static analysis
 An AST-based (not just token-based) plagiarism mode
 Author
 
-Built by Annanya Mishra GitHub: @Annanyamishra04
+Built by Annanya  GitHub: @Annanyamishra04
 
 If you find bugs or have ideas, feel free to open an issue — this is very much a living project.
