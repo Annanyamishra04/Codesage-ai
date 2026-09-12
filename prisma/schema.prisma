@@ -1,0 +1,123 @@
+// CodeSage AI — Prisma schema
+// Uses PostgreSQL (Neon-compatible). Run `npx prisma migrate dev` locally.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+/// A registered CodeSage AI user. Owns their own reviews, plagiarism checks,
+/// and sessions. Passwords are always stored as salted bcrypt hashes —
+/// never in plain text — and are never selected into API responses.
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions          Session[]
+  reviews           Review[]
+  plagiarismChecks  PlagiarismCheck[]
+
+  @@index([email])
+}
+
+/// A server-side session record backing the httpOnly session cookie.
+/// Only a SHA-256 hash of the raw session token is stored, so a database
+/// leak alone can never be used to impersonate a user (the same design
+/// principle as password hashing).
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+/// A single AI + static-analysis code review, fully persisted so it can be
+/// revisited later from the History pages. Always owned by exactly one user.
+model Review {
+  id       String @id @default(cuid())
+  language String
+
+  originalCode String @db.Text
+
+  summary             String @db.Text
+  overallScore        Int
+  securityScore       Int
+  performanceScore    Int
+  maintainabilityScore Int
+  readabilityScore    Int
+
+  /// Array of AiIssue objects (see src/types) — includes both AI-detected
+  /// and static-analysis-detected issues, tagged by `source`.
+  issues Json
+
+  /// Array of strings.
+  strengths Json
+
+  refactoredCode      String @db.Text
+  finalRecommendation String @db.Text
+
+  /// Which AI provider/model produced this review (e.g. "mock", "openai:gpt-4o-mini").
+  aiProvider String @default("mock")
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([language])
+  @@index([overallScore])
+  @@index([createdAt])
+  @@index([userId])
+}
+
+/// A saved code-similarity / plagiarism-analysis result. The similarity
+/// score is computed locally (tokenization + n-gram + sequence matching —
+/// see src/lib/plagiarism/similarity.ts) and is NOT a claim of internet- or
+/// GitHub-wide plagiarism detection; it only compares the two snippets the
+/// user submitted.
+model PlagiarismCheck {
+  id       String @id @default(cuid())
+  title    String @default("Untitled comparison")
+  language String
+
+  sourceCode     String @db.Text
+  comparisonCode String @db.Text
+
+  similarityScore Int
+  classification  String
+
+  /// Per-signal breakdown from compareCode(), persisted so the History
+  /// detail view can show the same breakdown as the initial analysis.
+  rawTokenSimilarity        Int @default(0)
+  normalizedTokenSimilarity Int @default(0)
+  matchedCoverage           Int @default(0)
+
+  /// Array of MatchedSection objects (see src/types/plagiarism.ts).
+  matchedSections Json
+  explanation     String @db.Text
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([similarityScore])
+  @@index([createdAt])
+}

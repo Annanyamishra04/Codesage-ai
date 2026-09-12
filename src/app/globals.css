@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 20% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 20% 12%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 20% 12%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 220 14% 94%;
+    --accent-foreground: 222 20% 12%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 71% 35%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 45%;
+    --warning-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 217 91% 60%;
+    --radius: 0.6rem;
+  }
+
+  .dark {
+    --background: 222 30% 7%;
+    --foreground: 210 20% 96%;
+    --card: 222 26% 10%;
+    --card-foreground: 210 20% 96%;
+    --primary: 217 91% 65%;
+    --primary-foreground: 222 30% 7%;
+    --secondary: 222 20% 15%;
+    --secondary-foreground: 210 20% 96%;
+    --muted: 222 20% 15%;
+    --muted-foreground: 218 11% 65%;
+    --accent: 222 20% 17%;
+    --accent-foreground: 210 20% 96%;
+    --destructive: 0 63% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 60% 45%;
+    --success-foreground: 222 30% 7%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 222 30% 7%;
+    --border: 222 20% 18%;
+    --input: 222 20% 18%;
+    --ring: 217 91% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv11", "ss01";
+  }
+}
+
+/* Subtle scrollbars for editor/code panels */
+.thin-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 999px;
+}
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.code-font {
+  font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Brief emphasis flash applied to a Monaco line decoration when an issue is
+   clicked and the corresponding line is scrolled into view. */
+@keyframes line-highlight-flash {
+  0% {
+    background-color: hsl(var(--primary) / 0.35);
+  }
+  100% {
+    background-color: hsl(var(--primary) / 0.12);
+  }
+}
+.line-highlight-flash {
+  background-color: hsl(var(--primary) / 0.12);
+  animation: line-highlight-flash 1.8s ease-out;
+}
