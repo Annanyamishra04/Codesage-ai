@@ -4,7 +4,8 @@ An AI-powered code reviewer and plagiarism checker I built to actually understan
 
 You paste your code, pick a language, and get back a structured review: bugs, security issues, performance notes, readability feedback, and even a refactored version of your code. There's also a plagiarism/similarity checker that compares two snippets and tells you why they're similar, not just a random score.
 
-🔗 Live demo: [add your Vercel URL here] 📦 Tech: Next.js 14 · TypeScript · Prisma · PostgreSQL · Tailwind CSS
+🔗 Live demo: https://codesage-ai-two.vercel.app/
+📦 Tech: Next.js 14 · TypeScript · Prisma · PostgreSQL · Tailwind CSS
 
 Why I built this
 
